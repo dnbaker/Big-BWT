@@ -17,7 +17,7 @@ struct KR_window {
     int wsize;
     std::vector<int> window;
     int asize;
-    const uint64_t prime = 1999999973;
+    static constexpr uint64_t prime = 1999999973;
     uint64_t hash;
     uint64_t tot_char;
     uint64_t asize_pot;   // asize^(wsize-1) mod prime
