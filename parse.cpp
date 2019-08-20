@@ -72,7 +72,7 @@ std::tuple<size_t, size_t> select_windows_2bit_wang(const char* s, const size_t 
     for (size_t i = 0; i < k; ++i) {
         if(s[i] <= Dollar) 
             die("invalid character found in input!\n");
-        if((c =  (int) seq_nt4_ntoa_table[(size_t) s[i]]) < 3)
+        if((c =  (int) seq_nt4_ntoa_table[(size_t) s[i]]) > 3)
         // disallow non-ACGTN so we can pack in 2 bits
             { fprintf(stderr, "unrecognized character %c in input! aborting...\n", s[i]); exit(1); }
         update(kmer, c);
@@ -81,8 +81,8 @@ std::tuple<size_t, size_t> select_windows_2bit_wang(const char* s, const size_t 
     for (size_t i = 0; i < l - k; ++i) {
         if(s[i + k] <= Dollar)
             die("invalid character found in input!\n");
-        c = (int) seq_nt4_ntoa_table[(size_t) s[i+k]];
-        if (c > 3) { fprintf(stderr, "unrecognized character %c in input! aborting...\n", c); exit(1); }
+        if((c = (int) seq_nt4_ntoa_table[(size_t) s[i+k]]) > 3)
+            { fprintf(stderr, "unrecognized character %c in input! aborting...\n", c); exit(1); }
         update(kmer, c);
         uint64_t kmer_hash = wang_hash(kmer);
         if (kmer_hash % p == 0) {
