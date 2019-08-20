@@ -16,7 +16,6 @@ constexpr inline uint64_t wang_hash(uint64_t key) {
 struct KR_window {
     int wsize;
     std::vector<int> window;
-    int *window;
     int asize;
     const uint64_t prime = 1999999973;
     uint64_t hash;
