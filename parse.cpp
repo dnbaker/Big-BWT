@@ -97,8 +97,8 @@ std::tuple<size_t, size_t> select_windows_rolling(const char* s, const size_t l,
         hf.eat(s[i]);
     } // we don't bother hashing the first kmer, since it's the start of a phrase anyway
     size_t start = 0;
-    for (size_t i = 1; i < l - k + 1; ++i) {
-        hf.update(s[i+k-1], s[i]);
+    for (size_t i = 0; i < l - k; ++i) {
+        hf.update(s[i], s[i+k]);
         if (hf.hashvalue % p == 0) {
             f(start, i+k-start); // user can do what they please with a phrase boundary
             start = i;
