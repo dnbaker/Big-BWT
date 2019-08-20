@@ -15,6 +15,7 @@ constexpr inline uint64_t wang_hash(uint64_t key) {
 
 struct KR_window {
     int wsize;
+    std::vector<int> window;
     int *window;
     int asize;
     const uint64_t prime = 1999999973;
@@ -22,19 +23,18 @@ struct KR_window {
     uint64_t tot_char;
     uint64_t asize_pot;   // asize^(wsize-1) mod prime
 
-    KR_window(int w): wsize(w) {
+    KR_window(int w): wsize(w), window(w) {
         asize = 256;
         asize_pot = 1;
         for(int i=1;i<wsize;i++)
             asize_pot = (asize_pot*asize)% prime; // ugly linear-time power algorithm
         // alloc and clear window
-        window = new int[wsize];
         reset();
     }
 
     // init window, hash, and tot_char
     void reset() {
-        for(int i=0;i<wsize;i++) window[i]=0;
+        std::fill(window.begin(), window.end(), 0);
         // init hash value and related values
         hash=tot_char=0;
     }
@@ -55,10 +55,6 @@ struct KR_window {
         for(int i=k+1;i<k+1+wsize;i++)
             w.append(1,window[i%wsize]);
         return w;
-    }
-
-    ~KR_window() {
-        delete[] window;
     }
 
 };

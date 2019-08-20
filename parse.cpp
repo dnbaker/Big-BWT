@@ -65,21 +65,25 @@ uint8_t seq_nt4_ntoa_table[] = {
 template<typename Func>
 std::tuple<size_t, size_t> select_windows_2bit_wang(const char* s, const size_t l, const size_t k, const size_t p, Func f) {
     uint64_t kmer = 0;
-    uint64_t mask = ((1ULL << 2 * k) - 1);
+    uint64_t mask = = maskfnc<uint64_t>(k * 2);
+    auto update = [mask](uint64_t &x, int c) {x = ((x << 2) | c) & mask;};
     // load the first kmer, then continue;
+    int c;
     for (size_t i = 0; i < k; ++i) {
-        if (s[i] <= Dollar) die("invalid character found in input!\n");
-        int c =  (int) seq_nt4_ntoa_table[(size_t) s[i]];
+        if(s[i] <= Dollar) 
+            die("invalid character found in input!\n");
+        if((c =  (int) seq_nt4_ntoa_table[(size_t) s[i]]) < 3)
         // disallow non-ACGTN so we can pack in 2 bits
-        if (c > 3) { fprintf(stderr, "unrecognized character %c in input! aborting...\n", s[i]); exit(1); }
-        kmer = (kmer << 2 | c) & mask;
+            { fprintf(stderr, "unrecognized character %c in input! aborting...\n", s[i]); exit(1); }
+        update(kmer, c);
     } // we don't bother hashing the first kmer, since it's the start of a phrase anyway
     size_t start = 0;
-    for (size_t i = 1; i < l - k + 1; ++i) {
-        if (s[i+k-1] <= Dollar) die("invalid character found in input!\n");
-        int c = (int) seq_nt4_ntoa_table[(size_t) s[i+k-1]];
-        if (c > 3) { fprintf(stderr, "unrecognized character %c in input! aborting...\n", s[i+k-1]); exit(1); }
-        kmer = (kmer << 2 | c) & mask;
+    for (size_t i = 0; i < l - k; ++i) {
+        if(s[i + k] <= Dollar)
+            die("invalid character found in input!\n");
+        c = (int) seq_nt4_ntoa_table[(size_t) s[i+k]];
+        if (c > 3) { fprintf(stderr, "unrecognized character %c in input! aborting...\n", c); exit(1); }
+        update(kmer, c);
         uint64_t kmer_hash = wang_hash(kmer);
         if (kmer_hash % p == 0) {
             f(start, i+k-start); // user can do what they please with a phrase boundary
